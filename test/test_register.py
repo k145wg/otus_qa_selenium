@@ -1,4 +1,5 @@
 from src.RegisterPage import RegisterPage
+from src.helpers import get_user_from_db, delete_user_from_db
 
 
 def test_privacy_agree(browser):
@@ -40,3 +41,12 @@ def test_diff_pass_confirm(browser):
     diff_pass_confirm_alert = registerPage.get_diff_pass_confirm_alert('qwerty', '123456')
     assert len(diff_pass_confirm_alert) == 1
     assert diff_pass_confirm_alert[0].text == 'Password confirmation does not match password!'
+
+
+def test_new_user_registration(browser, db_connection):
+    registerPage = RegisterPage(browser)
+    credits = registerPage.add_new_user()
+    db_row = get_user_from_db(db_connection, credits['firstname'], credits['lastname'])
+    assert db_row['firstname'] == credits['firstname']
+    assert db_row['lastname'] == credits['lastname']
+    delete_user_from_db(db_connection, credits['firstname'], credits['lastname'])

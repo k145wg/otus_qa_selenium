@@ -2,6 +2,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from src import helpers
+
 
 class RegisterPage:
     def __init__(self, browser):
@@ -44,18 +46,29 @@ class RegisterPage:
         return self.wait.until(EC.presence_of_element_located((By.ID, "input-confirm")))
 
     def _send_personal_data(self):
+        firstname = helpers.random_string(7)
+        lastname = helpers.random_string(12)
         el = self.wait.until(EC.presence_of_element_located((By.ID, "input-firstname")))
-        el.send_keys("Ivan")
+        el.send_keys(firstname)
         el = self.wait.until(EC.presence_of_element_located((By.ID, "input-lastname")))
-        el.send_keys("Petrov")
+        el.send_keys(lastname)
         el = self.wait.until(EC.presence_of_element_located((By.ID, "input-email")))
-        el.send_keys("petrov@example.com")
+        el.send_keys(helpers.random_email())
         el = self.wait.until(EC.presence_of_element_located((By.ID, "input-telephone")))
-        el.send_keys("+0 (123) 456-78-90")
+        el.send_keys(helpers.random_digits(10))
         checkbox = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//input[@name=\"agree\"]")))
         checked = checkbox.is_selected()
         if (not checked):
             checkbox.click()
+        return firstname, lastname
+
+    def _set_password(self):
+        password = helpers.random_password(14)
+        el = self.wait.until(EC.presence_of_element_located((By.ID, "input-password")))
+        el.send_keys(password)
+        el = self.wait.until(EC.presence_of_element_located((By.ID, "input-confirm")))
+        el.send_keys(password)
+        return password
 
     def get_diff_pass_confirm_alert(self, password=None, confirm_password=None):
         self.browser.get(self.address)
@@ -69,3 +82,11 @@ class RegisterPage:
         button = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//input[@class=\"btn btn-primary\"]")))
         button.click()
         return self.wait.until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@class=\"text-danger\"]")))
+
+    def add_new_user(self):
+        self.browser.get(self.address)
+        firstname, lastname = self._send_personal_data()
+        password = self._set_password()
+        button = self.wait.until(EC.visibility_of_element_located((By.XPATH, "//input[@class=\"btn btn-primary\"]")))
+        button.click()
+        return {'firstname': firstname, 'lastname': lastname, 'password': password}
