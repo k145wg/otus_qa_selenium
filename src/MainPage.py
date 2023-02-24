@@ -13,6 +13,16 @@ class MainPage:
     def get_form_currency(self):
         return self.wait.until(EC.visibility_of_element_located((By.ID, "form-currency")))
 
+    def change_currency(self, currency='Euro'):
+        self.browser.find_element_by_css_selector(
+            "#form-currency > div:nth-child(1) > button:nth-child(1) > span:nth-child(2)").click()
+        elements = self.browser.find_elements_by_css_selector(".open > ul:nth-child(2) > li")
+        for element in elements:
+            if currency in element.text:
+                element.click()
+                return currency
+        return ""
+
     def get_search(self):
         return self.wait.until(EC.visibility_of_element_located((By.ID, "search")))
 
@@ -40,3 +50,7 @@ class MainPage:
         register_element = self.wait.until(EC.visibility_of_element_located((By.XPATH, register_xpath)))
         login_element = self.wait.until(EC.visibility_of_element_located((By.XPATH, login_xpath)))
         return register_element, login_element
+
+    def add_to_cart(self):
+        elements = self.browser.find_elements_by_css_selector("div.product-layout")
+        elements[0].find_element_by_css_selector("button:nth-child(1)").click()

@@ -31,3 +31,17 @@ def test_my_account(browser):
     register_element, login_element = mainPage.get_my_account()
     assert register_element.text == "Register"
     assert login_element.text == "Login"
+
+
+def test_change_currency(browser):
+    mainPage = MainPage(browser)
+    mainPage.add_to_cart()
+    mainPage.change_currency('Euro')
+    cart_element_euro = mainPage.get_cart_text()
+    mainPage.change_currency('Pound Sterling')
+    cart_element_pound = mainPage.get_cart_text()
+    mainPage.change_currency('US Dollar')
+    cart_element_dollar = mainPage.get_cart_text()
+    assert cart_element_euro != cart_element_pound
+    assert cart_element_euro != cart_element_dollar
+    assert cart_element_pound != cart_element_dollar
